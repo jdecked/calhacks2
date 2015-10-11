@@ -50,6 +50,8 @@
             <p class="lead">
               <a href="#" class="btn btn-lg btn-default">whisper</a>
             </p>
+            <div id="iframe">
+            </div>
           </div>
 
         </div>
@@ -65,37 +67,67 @@
     <script src="js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
-    <script type="text/javascript" src="https://www.moxtra.com/api/js/moxtra-latest.js" id="moxtrajs" />
+    <script type="text/javascript" src="https://www.moxtra.com/api/js/moxtra-latest.js" id="moxtrajs"></script>
     <script>
+      // console.log("hello");
       var CLIENT_ID = "gTJHak9YzXw";
 
       function init(){
-        to_parse = $.post("https://apisandbox.moxtra.com/oauth/token", {
-          client_id=CLIENT_ID,
-          client_secret="n_aKVSppW5k",
-          grant_type="http://www.moxtra.com/auth_uniqueid",
-          timestamp=Date.now()
+        // num += 1;
+        var to_parse = $.post("https://apisandbox.moxtra.com/oauth/token", {
+          client_id: CLIENT_ID,
+          client_secret: "n_aKVSppW5k",
+          grant_type: "http://www.moxtra.com/auth_uniqueid",
+          timestamp: Date.now(),
+          uniqueid: "test"
         });
 
-        data = JSON.parse(to_parse);
+        to_parse.done(function(data) {
 
-        var options = {
-          mode: "sandbox", //for production environment change to "production"
-          client_id: CLIENT_ID,
-          access_token: data["access_token"], //valid access token from user authentication
-          invalid_token: function(event) {
-              alert("Access Token expired for session id: " + event.session_id);
-          }
-        };
-
-        Moxtra.init(options);
+          var options = {
+            mode: "sandbox", //for production environment change to "production"
+            client_id: CLIENT_ID,
+            access_token: data["access_token"], //valid access token from user authentication
+            invalid_token: function(event) {
+                alert("Access Token expired for session id: " + event.session_id);
+            }
+          };
+          // console.log("4");
+          Moxtra.init(options);
+          // console.log("4");
+          // console.log("in");
+          var options = {
+              iframe: true,
+              extension: { "show_dialogs": { "meet_invite": true } },
+              tagid4iframe: "iframe",
+              iframewidth: "1000px",
+              iframeheight: "750px",
+              start_meet: function(event) {
+                  alert("session key: " + event.session_key + " session id: " + event.session_id + " binder id: " + event.binder_id);
+              },
+              error: function(event) {
+                  alert("error code: " + event.error_code + " message: " + event.error_message);
+              },
+              resume_meet: function(event) {
+                  alert("session key: " + event.session_key + " session id: " + event.session_id + " binder id: " + event.binder_id);
+              },
+              end_meet: function(event) {
+                  alert("Meet end event");
+              }
+            };
+            Moxtra.meet(options);
+          // console.log("5");
+        }).fail(function(xhr, ajaxOptions, thrownError) {
+            console.log(xhr);
+          });
       };
 
-      var start_chat = function(){
+      function start_chat(){
+        console.log("in");
         var options = {
             iframe: true,
             extension: { "show_dialogs": { "meet_invite": true } },
-            tagid4iframe: "inner-cover",
+            tagid4iframe: "iframe",
             iframewidth: "1000px",
             iframeheight: "750px",
             start_meet: function(event) {
@@ -113,15 +145,21 @@
           };
           Moxtra.meet(options);
         };
-
+      // console.log("0");
       $(document).ready(function(){
         // $(".cover-heading").hide();
         $("p").hide();
         // $(".cover-heading").animate({width:"show"}, 3000);
         $("p").fadeIn(2000);
-        // $(".btn").on("click", function(){
-        //   $(document).empty();
-        // });
+        // console.log("1");
+        $(".btn").on("click", function(){
+          // console.log('2');
+          $("p").empty();
+          // console.log("3");
+          init();
+          // console.log("4");
+
+        });
       });
     </script>
   </body>
